@@ -29,9 +29,15 @@ characterButton.click()
 wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div/a')))
 acceptCookiesButton2 = driver.find_element(By.XPATH, '/html/body/div[2]/div/a')
 acceptCookiesButton2.click()
+wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="DataTables_Table_3_wrapper"]')))
 
+#There are three divs with the same class name. We need data only frome the first one
+parentDiv = driver.find_element(By.XPATH, '//*[@id="DataTables_Table_3_wrapper"]')
+wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="DataTables_Table_3_wrapper"]')))
 
-
+#Locate every element by class name in parent div. Pass that number to loop
+elements = parentDiv.find_elements(By.CLASS_NAME, 'character-metric-name')
+dpsList = {}
 
 def saveData(playerIndex):
     # WebDriverWait(driver,timeout=30).until(lambda d: d.find_element(By.XPATH,'/html/body/div[4]/div[4]/div[2]/div/div/div[3]/div[6]/div[1]/a[1]'))
@@ -46,20 +52,20 @@ def saveData(playerIndex):
     dps = driver.find_element(By.XPATH, '//*[@id="boss-table"]/tbody/tr[1]/td[3]/a')
     timesKilled = driver.find_element(By.XPATH, '//*[@id="top-box"]/div[2]/table/tbody/tr[2]/td[2]').text
     temp = int(timesKilled)
-    dpsList = {}
+
 
     for x in range(temp-1):
         # dpsList.append(driver.find_element(By.XPATH, '//*[@id="boss-table"]/tbody/tr['+str(x+2)+']/td[3]/a').text)
-        dpsList.setdefault(driver.find_element(By.XPATH, '//*[@id="boss-table"]/tbody/tr['+str(x+1)+']/td[3]/a').text,[]).append(driver.find_element(By.XPATH, '//*[@id="boss-table"]/tbody/tr['+str(x+1)+']/td[4]').text)
-
+        #dpsList.setdefault(driver.find_element(By.XPATH, '//*[@id="boss-table"]/tbody/tr['+str(x+1)+']/td[3]/a').text,[]).append(driver.find_element(By.XPATH, '//*[@id="boss-table"]/tbody/tr['+str(x+1)+']/td[4]').text)
+        dpsList.setdefault(driver.find_element(By.XPATH, '//*[@id="character-name"]/a').text,[]).append((driver.find_element(By.XPATH, '//*[@id="boss-table"]/tbody/tr['+str(x+1)+']/td[4]').text,driver.find_element(By.XPATH, '//*[@id="boss-table"]/tbody/tr['+str(x+1)+']/td[3]/a').text))
+        
     print(dpsList)
-    # driver.back()
-    # driver.back()
+
     driver.execute_script("window.history.go(-2)")
     wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="DataTables_Table_3"]/tbody/tr['+str(playerIndex+1)+']/td[1]/a')))
 
 
-for x in range(20):
+for x in range(len(elements)):
     saveData(x+1)
 while(True):
     pass
