@@ -6,6 +6,24 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import matplotlib.pyplot as plt
+import gspread
+
+
+sa = gspread.service_account()
+sh = sa.open("WoW_Logs")
+wks = sh.worksheet("Kolektyw")
+print('Rows: ',wks.row_values)
+print('Cols', wks.col_count)
+#######################################
+# data = {
+#     'key1': ['value1', 'value2', 'value3'],
+#     'key2': ['value4', 'value5'],
+#     'key3': ['value6']
+# }
+# values = [[key] + data[key] for key in data]
+# wks.update('A1', values)  # Write the values starting from cell A1
+
+
 
 options = Options()
 options.add_argument('--ignore-certificate-errors')
@@ -64,8 +82,23 @@ def saveData(playerIndex):
     driver.execute_script("window.history.go(-2)")
     wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="DataTables_Table_3"]/tbody/tr['+str(playerIndex+1)+']/td[1]/a')))
 
-
-for x in range(len(elements)):
+#len(elements)
+for x in range(15):
     saveData(x+1)
+
+# values=[[key]+dpsList[key] for key in dpsList]
+# print(values[0])
+# wks.update('A1',values)
+
+
+rows = []
+for key, values in dpsList.items():
+    for value in values:
+        rows.append([key] + list(value))
+
+headers =['Name','ItemLVL','DPS']
+rows.insert(0,headers)
+wks.insert_rows(rows,row=1)
+
 while(True):
     pass
